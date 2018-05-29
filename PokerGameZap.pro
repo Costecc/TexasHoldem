@@ -8,12 +8,10 @@ SOURCES += \
     game.cpp \
     userinterface.cpp \
     user.cpp \
-    player.cpp \
     bot.cpp
 
 HEADERS += \
     game.h \
     userinterface.h \
     user.h \
-    player.h \
     bot.h

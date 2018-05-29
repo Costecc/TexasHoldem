@@ -5,20 +5,28 @@
 UserInterface::UserInterface()
 {
     cout << "Podaj nick, aby rozpoczac gre: ";
-    cin >> nick;
+    getline(cin, nick);
 }
 
-void UserInterface::showCards(int phase, int kind, int colour)
+UserInterface::~UserInterface()
 {
-    if(phase == 2)
-        cout << "\n1 faza - Reka startowa: \n";
-    if(phase == 4)
-        cout << "\n2 faza - Flop: \n";
-    if(phase == 7)
-        cout << "\n3 faza - Turn: \n";
-    if(phase == 8)
-        cout << "\n4 faza - River: \n";
 
+}
+
+void UserInterface::showPhase(int phase)
+{
+    if(phase == 1)
+        cout << "\n1 faza - Reka startowa: \n";
+    if(phase == 2)
+        cout << "\n2 faza - Flop: \n";
+    if(phase == 3)
+        cout << "\n3 faza - Turn: \n";
+    if(phase == 4)
+        cout << "\n4 faza - River: \n";
+}
+
+void UserInterface::showCards(int kind, int colour)
+{
     switch(kind)
     {
         case 11: cout << "[ J"; break;
@@ -39,18 +47,18 @@ void UserInterface::showCards(int phase, int kind, int colour)
 
 }
 
-void UserInterface::showPot(int bBet, int pBet){
-    cout << "\n+++ PULA WYNOSI " << bBet + pBet << "\n";
+void UserInterface::showPot(int pot){
+    cout << "\n+++ PULA WYNOSI " << pot << "\n";
 }
 
 string UserInterface::showWinner(int winner)
 {
     if(winner == 0)
-        return "++++++++++++++++++++\nGratulacje! Wygrales gre!";
+        return "++++++++++++++++++++\nGratulacje! Wygrales gre!\n";
     else if(winner == 1)
-        return "--------------------\nWygrywa przeciwnik. Sprobuj ponownie!";
+        return "--------------------\nWygrywa przeciwnik. Sprobuj ponownie!\n";
     else
-        return "--------------------\nWystapil blad. Uruchom ponownie aplikacje!";
+        return "--------------------\nWystapil blad. Uruchom ponownie aplikacje!\n";
 }
 
 void UserInterface::playerDecisionOption(int mBet, int money)
@@ -58,13 +66,13 @@ void UserInterface::playerDecisionOption(int mBet, int money)
     cout<<"\nTwoja decyzja. Minimum: " << mBet << ", maksimum: " << money << ". 0 to pas.\n";
 }
 
-void UserInterface::botDecision(int botBet, int playerBet)
+void UserInterface::botDecision(int decision, int botBet)
 {
-    if(botBet > playerBet)
+    if(decision == 2)
         cout << "--- Komputer przebija do " << botBet << ".\n";
-    if(botBet == playerBet)
+    if(decision == 1)
         cout << "--- Komputer sprawdza (" << botBet << ").\n";
-    if(botBet == 0)
+    if(decision == 0)
         cout << "--- Komputer pasuje.\n";
 }
 
@@ -82,3 +90,4 @@ void UserInterface::nextRound(int round)
 {
     cout << "\n--- ROZPOCZYNAMY " << round << " ROZDANIE!\n";
 }
+

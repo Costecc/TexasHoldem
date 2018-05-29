@@ -20,6 +20,7 @@ class Game
 public:
     Card deck[9];
     Game();
+    ~Game();
     struct HandHistory
     {
         string hand;
@@ -32,8 +33,8 @@ public:
     int finishGame(int money);
     void setPot(int bBet, int pBet);
     int returnPot();
-    void addHandToHistory(HandHistory * &history);
-    void saveGameToFile();
+    void addHandToHistory(int round, HandHistory * &history);
+    void saveGameToFile(HandHistory * & head);
 };
 
 #endif // GAME_H

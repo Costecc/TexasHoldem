@@ -8,7 +8,7 @@ Bot::Bot()
 int Bot::AIMakeBet(int playerBet, int playerMoney)
 {
     int AIBet = rand()%20;
-    int newBet;
+    int newBet = 0;
 
     if(playerBet <= money)
     {

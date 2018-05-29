@@ -13,13 +13,15 @@ class UserInterface
 
 public:
     UserInterface();
-    void showCards(int phase, int kind, int colour);
+    ~UserInterface();
+    void showPhase(int phase);
+    void showCards(int kind, int colour);
     string showWinner(int winner);
     void playerDecisionOption(int mBet, int money);
-    void botDecision(int botBet, int playerBet);
+    void botDecision(int decision, int botBet);
     void playerDecision(int decision);
     void nextRound(int round);
-    void showPot(int bBet, int pBet);
+    void showPot(int pot);
 };
 
 #endif // USERINTERFACE_H

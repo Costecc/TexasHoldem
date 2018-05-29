@@ -7,14 +7,46 @@
 
 using namespace std;
 
+Game game;
+UserInterface display;
+User player;
+Bot bot;
+
+void displayCards(int phase)
+{
+    if(phase == 1)
+    {
+        display.showPhase(phase);
+        display.showCards(game.returnCards(2, 0), game.returnCards(2, 1));
+        display.showCards(game.returnCards(3, 0), game.returnCards(3, 1));
+        display.showPot(0);
+    }
+    else
+    {
+        display.showPhase(phase);
+
+        display.showCards(game.returnCards(4, 0), game.returnCards(4, 1));
+        display.showCards(game.returnCards(5, 0), game.returnCards(5, 1));
+        display.showCards(game.returnCards(6, 0), game.returnCards(6, 1));
+
+        if(phase == 3)
+            display.showCards(game.returnCards(7, 0), game.returnCards(7, 1));
+        else if(phase == 4)
+        {
+            display.showCards(game.returnCards(7, 0), game.returnCards(7, 1));
+            display.showCards(game.returnCards(8, 0), game.returnCards(8, 1));
+        }
+
+        display.showPot(game.returnPot());
+    }
+}
+
 int main()
 {
-    Game game;
-    UserInterface display;
-    User player;
-    Bot bot;
-    int nextRound = false;
-    int round = 1;
+    bool nextRound = false;
+    int winner = 0;
+    int round = 0;
+    int phase = 0;
     game.history = NULL;
 
     while(true)
@@ -22,141 +54,87 @@ int main()
         //Finish game
         if(player.returnMoney() == 1000)
         {
-            display.showWinner(0);
+            cout << display.showWinner(0);
             break;
         }
         else if(player.returnMoney() == 0)
         {
-            display.showWinner(1);
+            cout << display.showWinner(1);
             break;
         }
 
-        display.nextRound(round);
+        //Initialize round
+        game.setPot(0, 0);
+        round++;
         nextRound = false;
-
+        phase = 1;
         game.shuffleCards();
-        game.addHandToHistory(game.history);
+        game.addHandToHistory(round, game.history);
+        display.nextRound(round);
+        winner = 0;
 
-        display.showCards(2, game.returnCards(2, 0), game.returnCards(2, 1));
-        display.showCards(3, game.returnCards(3, 0), game.returnCards(3, 1));
-        display.showPot(0, 0);
-
-        display.playerDecisionOption(game.returnMinBet(), min(player.returnMoney(), bot.returnMoney()));//mozliwosc decyzji gracza wyswietla
-
-        do
+        while(phase != 5)
         {
-            //Gracz pasuje (koniec rozdania)
-            if(player.makeBet(game.returnMinBet(), bot.returnBet() + bot.returnMoney()) == 0)
-            {
-                display.playerDecision(0);
-                nextRound = true;
-                break;
-            }
-            else if(player.returnBet() == max(game.returnMinBet(), bot.returnBet()))
-                display.playerDecision(1);
-            else if(player.returnBet() > max(game.returnMinBet(), bot.returnBet()))
-                display.playerDecision(2);
-
-            //Wyrownanie zakladow, przejscie do nastepnej fazy gry (flop)
-            if(player.returnBet() == bot.returnBet())
-                break;
-
-            display.botDecision(bot.AIMakeBet(player.returnBet(), player.returnMoney()), player.returnBet());
-
-            //Bot pasuje
-            if( (bot.returnBet() < player.returnBet()))
-            {
-                nextRound = true;
-                break;
-            }
-        }while(player.returnBet() != bot.returnBet());
-
-        game.setPot(bot.returnBet(), player.returnBet());
-
-        if(nextRound == true)
-        {
-            if(player.returnBet() > bot.returnBet())
-                player.setMoney(player.returnMoney() + game.returnPot());
-            else
-                bot.setMoney(bot.returnMoney() + game.returnPot());
-
-            game.setPot(0, 0);
             player.resetBet();
             bot.resetBet();
-            round++;
-            continue;
-        }
-        else
-            game.setPot(bot.returnBet(), player.returnBet());
 
+            //Display cards depending on game phase, flop etc..
+            displayCards(phase);
 
-        // -----------------------------
-        // ----- 2 FAZA GRY - FLOP -----
-        // -----------------------------
-        display.showCards(4, game.returnCards(4, 0), game.returnCards(4, 1));
-        display.showCards(5, game.returnCards(5, 0), game.returnCards(5, 1));
-        display.showCards(6, game.returnCards(6, 0), game.returnCards(6, 1));
-        display.showPot(player.returnBet(), bot.returnBet());
+            display.playerDecisionOption(game.returnMinBet(), min(player.returnMoney(), bot.returnMoney()));
 
-        display.playerDecisionOption(0, player.returnMoney());
-
-        do
-        {
-            //Gracz pasuje (koniec rozdania)
-            if(player.makeBet(game.returnMinBet(), bot.returnBet() + bot.returnMoney()) == 0)
+            while(true)
             {
-                display.playerDecision(0);
-                nextRound = true;
-                break;
+                if(player.makeBet(game.returnMinBet(), min(player.returnMoney(), bot.returnMoney())) == 0)
+                {
+                    display.playerDecision(0);
+                    nextRound = true;
+                    winner = 2;
+                    break;
+                }
+                else if(player.returnBet() == max(game.returnMinBet(), bot.returnBet()))
+                {
+                    display.playerDecision(1);
+                    if(bot.returnBet() != 0)
+                        break;
+                }
+                else if(player.returnBet() > bot.returnBet())
+                    display.playerDecision(2);
+
+                if(bot.AIMakeBet(player.returnBet(), player.returnMoney()) == 0)
+                {
+                    //Bot pass - next round
+                    display.botDecision(0, bot.returnBet());
+                    nextRound = true;
+                    winner = 1;
+                    break;
+                }
+                else if(player.returnBet() == bot.returnBet())
+                {
+                    display.botDecision(1, bot.returnBet());
+                    break;
+                }
+                else if(player.returnBet() < bot.returnBet())
+                    display.botDecision(2, bot.returnBet());
             }
-            else if(player.returnBet() == max(game.returnMinBet(), bot.returnBet()))
-                display.playerDecision(1);
-            else if(player.returnBet() > max(game.returnMinBet(), bot.returnBet()))
-                display.playerDecision(2);
 
-            //Wyrownanie zakladow, przejscie do nastepnej fazy gry (flop)
-            if(player.returnBet() == bot.returnBet())
+            game.setPot(player.returnBet(), bot.returnBet());
+            if(winner == 1)
+                player.setMoney(player.returnMoney() + game.returnPot());
+            else if(winner == 2)
+                bot.setMoney(bot.returnMoney() + game.returnPot());
+
+            phase++;
+
+            if(nextRound == true)
                 break;
-
-            display.botDecision(bot.AIMakeBet(player.returnBet(), player.returnMoney()), player.returnBet());
-
-            //Bot pasuje
-            if( (bot.returnBet() < player.returnBet()))
-            {
-                nextRound = true;
-                break;
-            }
-        }while(player.returnBet() != bot.returnBet());
-
-        if(nextRound == true)
-        {
-            game.setPot(0, 0);
-            round++;
-            continue;
+            else
+                continue;
         }
-        else
-            game.setPot(bot.returnBet(), player.returnBet());
-
-
-
-
-
-
-
-
-
-
-        display.showCards(7, game.returnCards(7, 0), game.returnCards(7, 1));
-        display.showCards(8, game.returnCards(8, 0), game.returnCards(8, 1));
-
-        display.playerDecisionOption(0, player.returnMoney());
-        player.makeBet(game.returnMinBet(), bot.returnBet() + bot.returnMoney());
-        display.botDecision(bot.AIMakeBet(player.returnBet(), player.returnMoney()), player.returnBet());
-
-
-
-        if(player.returnMoney() == 0 || player.returnMoney() == 1000)
-            break;
+        //player.setMoney(0);
     }
+
+    game.saveGameToFile(game.history);
+
     return 0;
 }

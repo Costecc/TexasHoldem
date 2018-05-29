@@ -1,10 +1,18 @@
 #include "game.h"
+#include <fstream>
+#include <algorithm>
+#include <string>
 
 using namespace std;
 
 Game::Game()
 {
     minBet = 20;
+}
+
+Game::~Game()
+{
+
 }
 
 int Game::returnMinBet(){
@@ -29,32 +37,31 @@ void Game::shuffleCards()
         newCard.colour = rand()%4+1;
         repeat = 0;
 
-    for(int j = 0; j < i; j++)
-    {
-        if(newCard.kind == deck[j].kind)
+        for(int j = 0; j < i; j++)
         {
-            if(newCard.colour == deck[j].colour)
+            if(newCard.kind == deck[j].kind)
             {
-                i--;
-                repeat++;
-                break;
+                if(newCard.colour == deck[j].colour)
+                {
+                    i--;
+                    repeat++;
+                    break;
+                }
             }
         }
-    }
 
-            if(repeat == 0) {
-                deck[i].kind = newCard.kind;
-                deck[i].colour = newCard.colour;
-               // cout << newCard.kind << " " << newCard.colour << "\n";
-            }
+        if(repeat == 0) {
+            deck[i].kind = newCard.kind;
+            deck[i].colour = newCard.colour;
         }
     }
+}
 
 int Game::returnCards(int cardToReturn, int dataToReturn)
 {
     if(dataToReturn == 0)
         return deck[cardToReturn].kind;
-    if(dataToReturn == 1)
+    else
         return deck[cardToReturn].colour;
 }
 
@@ -70,7 +77,10 @@ int Game::finishGame(int money)
 
 void Game::setPot(int bBet, int pBet)
 {
-    pot = bBet + pBet;
+    if(bBet == 0 && pBet == 0)
+        pot = 0;
+    else
+        pot += (bBet + pBet);
 }
 
 int Game::returnPot()
@@ -78,7 +88,7 @@ int Game::returnPot()
     return pot;
 }
 
-void Game::addHandToHistory(HandHistory * & head)
+void Game::addHandToHistory(int round, HandHistory * & head)
 {
   HandHistory * p, * e;
 
@@ -87,6 +97,8 @@ void Game::addHandToHistory(HandHistory * & head)
 
   string hand;
   int kind, colour;
+
+  hand = hand + "Runda nr " + to_string(round) + "\n";
 
   for(int i = 0; i < 9; i++)
   {
@@ -105,7 +117,7 @@ void Game::addHandToHistory(HandHistory * & head)
           case 13: hand += "[ K"; break;
           case 14: hand += "[ A"; break;
       default: hand += "[ ";
-                hand += char(kind+48); break;
+                hand += char(kind+47); break;
       }
 
       switch(colour)
@@ -120,7 +132,6 @@ void Game::addHandToHistory(HandHistory * & head)
           hand += "\nKarty wspolne: ";
   }
 
-
   e->hand = hand;
   p = head;
   if(p)
@@ -129,10 +140,37 @@ void Game::addHandToHistory(HandHistory * & head)
      p->next = e;
   }
   else head = e;
+
+  hand += "\n";
 }
 
-void Game::saveGameToFile()
+void Game::saveGameToFile(HandHistory * & head)
 {
+    HandHistory * p;
+    p = head;
 
+    string filename;
+    cout << "Podaj nazwe pliku do zapisu BEZ ROZSZERZENIA: ";
+    cin >> filename;
 
+    filename += ".txt";
+
+    ofstream file;
+    file.open(filename);
+
+    if(!file.is_open() || filename.length() < 5)
+    {
+        cout << "\nNie udalo sie utworzyc pliku!";
+    }
+    else
+    {
+        cout << "\nPoprawnie utworzono plik " << filename << "\n";
+
+        while(p)
+        {
+          file << (p->hand);
+          p = p->next;
+        }
+    }
+    file.close();
 }

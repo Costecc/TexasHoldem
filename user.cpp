@@ -5,6 +5,11 @@ User::User()
     money = 500;
 }
 
+User::~User()
+{
+
+}
+
 int User::returnMoney()
 {
     return money;
@@ -16,14 +21,14 @@ void User::setMoney(int newMoney)
 }
 
 int User::makeBet(int minBet, int maxBet) {
-    int newBet;
+    int newBet = 0;
     do
     {
-        cout<<"Podaj kwote zakladu: ";
-        cin >> newBet;
-
-        if(!cin)
-            newBet = 0;
+        while (cout << "Podaj kwote zakladu: " && !(cin >> newBet)) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Bledna kwota! Wprowadz ponownie: ";
+        }
 
         if(newBet == 0)
             break;

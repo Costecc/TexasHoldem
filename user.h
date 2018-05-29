@@ -16,6 +16,7 @@ protected:
 
 public:
     User();
+    virtual ~User();
     int returnMoney();
     void setMoney(int newMoney);
     int makeBet(int minBet, int maxBet);
