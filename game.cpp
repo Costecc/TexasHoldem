@@ -8,11 +8,12 @@ using namespace std;
 Game::Game()
 {
     minBet = 20;
+    round = 0;
 }
 
 Game::~Game()
 {
-
+    delete history;
 }
 
 int Game::returnMinBet(){
@@ -88,6 +89,16 @@ int Game::returnPot()
     return pot;
 }
 
+void Game::setRound(int newRound)
+{
+    round = newRound;
+}
+
+int Game::returnRound()
+{
+    return round;
+}
+
 void Game::addHandToHistory(int round, HandHistory * & head)
 {
   HandHistory * p, * e;
@@ -144,7 +155,7 @@ void Game::addHandToHistory(int round, HandHistory * & head)
   hand += "\n";
 }
 
-void Game::saveGameToFile(HandHistory * & head)
+void Game::saveHistoryToFile(HandHistory * & head)
 {
     HandHistory * p;
     p = head;
@@ -171,6 +182,71 @@ void Game::saveGameToFile(HandHistory * & head)
           file << (p->hand);
           p = p->next;
         }
+    }
+    file.close();
+}
+
+int Game::getGameFromFile()
+{
+    string filename = "gamestatus.txt";
+
+    ifstream file;
+    file.open(filename);
+
+    if(!file.is_open())
+    {
+        cout << "\nNie udalo sie otworzyc pliku! Zaczynamy nowa gre.\n";
+        return -1;
+    }
+    else
+    {
+        cout << "\nPoprawnie otworzono plik " << filename << "\n";
+
+            string line, sRound, sPlayerStack;
+            getline(file, line);
+            int lineLength = line.length(), stack;
+
+            for(int i = 0; i < lineLength; i++)
+            {
+                if(line[i] == '.')
+                {
+                    for(int j = i + 1; j < lineLength; j++)
+                        sPlayerStack += line[j];
+
+                    break;
+                }
+
+                sRound += line[i];
+            }
+
+            round = stoi(sRound) - 1;
+            stack = stoi(sPlayerStack);
+
+            if(round > 1000 || round < 1)
+                round = 1;
+
+            if(stack > 1000 || stack < 0)
+                stack = 500;
+
+        return stack;
+    }
+    file.close();
+}
+
+void Game::saveGameToFile(int playerMoney)
+{
+    string filename = "gamestatus.txt";
+    ofstream file;
+    file.open(filename);
+
+    if(!file.is_open())
+    {
+        cout << "\nNie udalo sie utworzyc pliku!";
+    }
+    else
+    {
+        cout << "\n--- Zapisano stan gry!\n";
+        file << round << "." << playerMoney;
     }
     file.close();
 }

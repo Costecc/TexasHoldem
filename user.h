@@ -4,24 +4,29 @@
 #include <string>
 #include <iostream>
 
+#include "player.h"
+
 using namespace std;
 
-class User
+class User : public Player
 {
-    string name;
-
-protected:
-    int money;
-    int bet;
+    string nick;
 
 public:
     User();
-    virtual ~User();
-    int returnMoney();
-    void setMoney(int newMoney);
+    ~User();
+    void displayStacks(int userStack, int botStack);
+    void showPhase(int phase);
+    void showCards(int kind, int colour);
+    string showWinner(int winner);
+    void playerDecisionOption(int mBet, int money);
+    void botDecision(int decision, int botBet);
+    void playerDecision(int decision);
     int makeBet(int minBet, int maxBet);
-    int returnBet();
-    void resetBet();
+    void nextRound(int round);
+    void showPot(int pot);
+    bool readGameMessage();
+    void instructionMessage();
 };
 
 #endif // USER_H

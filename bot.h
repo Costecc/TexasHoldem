@@ -2,8 +2,9 @@
 #define BOT_H
 
 #include "user.h"
+#include "player.h"
 
-class Bot : public User
+class Bot : public Player
 {
 public:
     Bot();

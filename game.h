@@ -4,7 +4,6 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
-#include "userinterface.h"
 
 using namespace std;
 
@@ -17,6 +16,7 @@ class Game
     };
     int minBet;
     int pot;
+    int round;
 public:
     Card deck[9];
     Game();
@@ -33,8 +33,12 @@ public:
     int finishGame(int money);
     void setPot(int bBet, int pBet);
     int returnPot();
+    void setRound(int newRound);
+    int returnRound();
     void addHandToHistory(int round, HandHistory * &history);
-    void saveGameToFile(HandHistory * & head);
+    void saveHistoryToFile(HandHistory * & head);
+    int getGameFromFile();
+    void saveGameToFile(int playerMoney);
 };
 
 #endif // GAME_H

@@ -6,12 +6,12 @@ CONFIG -= qt
 SOURCES += \
         main.cpp \
     game.cpp \
-    userinterface.cpp \
     user.cpp \
-    bot.cpp
+    bot.cpp \
+    player.cpp
 
 HEADERS += \
     game.h \
-    userinterface.h \
     user.h \
-    bot.h
+    bot.h \
+    player.h
