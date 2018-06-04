@@ -7,6 +7,13 @@
 
 using namespace std;
 
+/**
+ * @brief Funkcja wyswietlajaca karty zaleznie od fazy gry
+ * @param phase : Aktualna faza gry
+ * @param user : Referencja do obiketu reprezentujacego gracza
+ * @param game : Referencja do obiketu reprezentujacego gre
+ */
+
 void userCards(int phase, User &user, Game &game)
 {
     if(phase == 1)
